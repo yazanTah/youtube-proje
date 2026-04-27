@@ -1,4 +1,6 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const BACKEND_URL = import.meta.env.VITE_AI_METRICS_BASE_URL || "https://yazantah-production.up.railway.app";
 const DASHBOARD_KEY = import.meta.env.VITE_AI_DASHBOARD_KEY || "1";
@@ -100,7 +102,29 @@ function App() {
               </svg>
               BİLGİ ÇIKARMA TAMAMLANDI
             </div>
-            <div className="summary-content">{summary}</div>
+            <div className="summary-content markdown-body">
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  blockquote: ({ children }) => {
+                    const text = children?.[1]?.props?.children?.[0] || "";
+                    const isAlert = typeof text === 'string' && text.startsWith("[!");
+                    
+                    if (isAlert) {
+                      const match = text.match(/\[!(TIP|IMPORTANT|WARNING|CAUTION|NOTE)\]/);
+                      const type = match ? match[1].toLowerCase() : "note";
+                      // Remove the [!TYPE] text from the content
+                      const newChildren = [...children];
+                      // This is a bit hacky but works for standard markdown structures
+                      return <div className={`alert alert-${type}`}>{children}</div>;
+                    }
+                    return <blockquote>{children}</blockquote>;
+                  }
+                }}
+              >
+                {summary}
+              </ReactMarkdown>
+            </div>
           </div>
         )}
       </div>
@@ -109,3 +133,4 @@ function App() {
 }
 
 export default App;
+
