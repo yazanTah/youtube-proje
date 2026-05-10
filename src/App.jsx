@@ -2,135 +2,188 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const BACKEND_URL = import.meta.env.VITE_AI_METRICS_BASE_URL || "https://yazantah-production.up.railway.app";
+const BACKEND_URL =
+  import.meta.env.VITE_AI_METRICS_BASE_URL ||
+  "https://yazantah-production.up.railway.app";
+
 const DASHBOARD_KEY = import.meta.env.VITE_AI_DASHBOARD_KEY || "1";
 
 function App() {
-  const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [summary, setSummary] = useState("");
-  const [error, setError] = useState("");
+  const [link, setLink] = useState("");
+  const [ozet, setOzet] = useState("");
+  const [hata, setHata] = useState("");
+  const [yukleniyor, setYukleniyor] = useState(false);
+  const [videoId, setVideoId] = useState("");
 
-  const handleSummarize = async () => {
-    if (!url) {
-      setError("GEÇERLİ BİR YOUTUBE URL'Sİ GİRİN");
+  // YouTube linkinin içinden video id bilgisini alıyoruz.
+  // Bu id sayesinde hem backend'e doğru linki gönderiyoruz hem de kapak fotoğrafını gösteriyoruz.
+  function videoIdBul(youtubeLink) {
+    const sonuc = youtubeLink.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+    return sonuc ? sonuc[1] : "";
+  }
+
+  // Kullanıcı inputa yazı yazdığında çalışır.
+  // Link doğruysa video kapağını hemen gösterebilmek için video id'yi burada da alıyoruz.
+  function linkDegisti(e) {
+    const yeniLink = e.target.value;
+    setLink(yeniLink);
+
+    const bulunanId = videoIdBul(yeniLink);
+    setVideoId(bulunanId);
+  }
+
+  // Özetle butonuna basınca backend tarafına istek gönderiyoruz.
+  async function ozetle() {
+    const bulunanId = videoIdBul(link);
+
+    if (!link.trim()) {
+      setHata("Lütfen bir YouTube bağlantısı girin.");
       return;
     }
 
-    const videoIdMatch = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11}).*/);
-    const videoId = videoIdMatch ? videoIdMatch[1] : null;
-
-    if (!videoId) {
-      setError("GEÇERSİZ YOUTUBE BAĞLANTI FORMATI");
+    if (!bulunanId) {
+      setHata("Lütfen geçerli bir YouTube bağlantısı girin.");
       return;
     }
 
-    setError("");
-    setLoading(true);
-    setSummary("");
+    setVideoId(bulunanId);
+    setHata("");
+    setOzet("");
+    setYukleniyor(true);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/youtube/extract`, {
+      const cevap = await fetch(`${BACKEND_URL}/api/youtube/extract`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-dashboard-key": DASHBOARD_KEY
+          "x-dashboard-key": DASHBOARD_KEY,
         },
         body: JSON.stringify({
-          youtubeUrl: url,
+          youtubeUrl: link,
           noteId: "dashboard",
-          userId: "dashboard-admin"
-        })
+          userId: "dashboard-admin",
+        }),
       });
 
-      const data = await response.json();
+      const veri = await cevap.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || data.fallbackMessage || "İSTEK BAŞARISIZ");
+      if (!cevap.ok) {
+        throw new Error(
+          veri.error || veri.fallbackMessage || "Özet oluşturulamadı."
+        );
       }
 
-      setSummary(data.summary || "ÖZET OLUŞTURULAMADI");
+      setOzet(veri.summary || "Özet oluşturulamadı.");
     } catch (err) {
-      setError(err.message.toUpperCase());
+      setHata(err.message);
     } finally {
-      setLoading(false);
+      setYukleniyor(false);
     }
-  };
+  }
 
   return (
-    <div className="container">
-      <div className="dashboard-card">
-        <header className="header">
-          <h1>YOUTUBE.AI</h1>
-          <p>HERHANGİ BİR VİDEODAN ANINDA BİLGİ ÇIKARIN</p>
-        </header>
+    <main className="sayfa">
+      <section className="baslikAlani">
+        <h1>
+          YOUTUBE<span>.AI</span>
+        </h1>
+        <p>Videoyu izleme. Özetini oku.</p>
+      </section>
 
-        <div className="input-group">
-          <input
-            type="text"
-            className="youtube-input"
-            placeholder="YOUTUBE BAĞLANTISINI YAPIŞTIRIN..."
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            disabled={loading}
-            onKeyDown={(e) => e.key === "Enter" && handleSummarize()}
-          />
+      <section className="camKart">
+        <div className="kartBaslik">
+          <div className="ikonKutu">↗</div>
+
+          <div>
+            <h2>YOUTUBE BAĞLANTINI YAPIŞTIR</h2>
+            <p>Herhangi bir YouTube videosunun bağlantısını gir</p>
+          </div>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        <div className="inputAlani">
+          <div className="youtubeIkon">▶</div>
+
+          <input
+            type="text"
+            value={link}
+            placeholder="https://www.youtube.com/watch?v=..."
+            disabled={yukleniyor}
+            onChange={linkDegisti}
+            onKeyDown={(e) => e.key === "Enter" && ozetle()}
+          />
+
+          <div className="kopyaIkon">□</div>
+        </div>
+
+        {hata && <div className="hataMesaji">{hata}</div>}
 
         <button
-          className="summarize-btn"
-          onClick={handleSummarize}
-          disabled={loading || !url}
+          className="ozetButon"
+          onClick={ozetle}
+          disabled={yukleniyor || !link}
         >
-          {loading ? (
+          {yukleniyor ? (
             <>
-              <div className="loader"></div>
-              İŞLENİYOR...
+              <span className="yukleme"></span>
+              ÖZETLENİYOR...
             </>
           ) : (
-            "ÖZET OLUŞTUR"
+            <>
+              ÖZETLE
+              <span>✦</span>
+            </>
           )}
         </button>
+      </section>
 
-        {summary && (
-          <div className="summary-section">
-            <div className="summary-header">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              BİLGİ ÇIKARMA TAMAMLANDI
-            </div>
-            <div className="summary-content markdown-body">
-              <ReactMarkdown 
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  blockquote: ({ children }) => {
-                    const text = children?.[1]?.props?.children?.[0] || "";
-                    const isAlert = typeof text === 'string' && text.startsWith("[!");
-                    
-                    if (isAlert) {
-                      const match = text.match(/\[!(TIP|IMPORTANT|WARNING|CAUTION|NOTE)\]/);
-                      const type = match ? match[1].toLowerCase() : "note";
-                      // Remove the [!TYPE] text from the content
-                      const newChildren = [...children];
-                      // This is a bit hacky but works for standard markdown structures
-                      return <div className={`alert alert-${type}`}>{children}</div>;
-                    }
-                    return <blockquote>{children}</blockquote>;
-                  }
-                }}
-              >
-                {summary}
-              </ReactMarkdown>
+      <section className="sonucKart">
+        <div className="sonucBaslik">
+          <div className="sonucSol">
+            <div className="kucukIkon">▣</div>
+            <h2>ÖZET SONUCU</h2>
+          </div>
+
+          <div className="aiYazi">✦ AI ile oluşturuldu</div>
+        </div>
+
+        {videoId && (
+          <div className="videoKutusu">
+            <img
+              src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+              alt="YouTube video kapağı"
+              onError={(e) => {
+                e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+              }}
+            />
+
+            <div className="videoBilgi">
+              <p>Seçilen video</p>
+              <span>Video ID: {videoId}</span>
             </div>
           </div>
         )}
-      </div>
-    </div>
+
+        <div className="ozetKutusu">
+          {ozet ? (
+            <div className="markdownAlani">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {ozet}
+              </ReactMarkdown>
+            </div>
+          ) : (
+            <div className="bosAlan">
+              <div className="bosIkon">▣</div>
+              <h3>Henüz bir özet oluşturulmadı</h3>
+              <p>
+                YouTube bağlantısını yapıştır ve yapay zeka ile videonun
+                özetini saniyeler içinde al.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    </main>
   );
 }
 
 export default App;
-
