@@ -17,25 +17,17 @@ body {
   min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
   color: var(--beyaz);
-  background:
-    radial-gradient(circle at 10% 20%, rgba(120, 130, 160, 0.35), transparent 25%),
-    radial-gradient(circle at 90% 18%, rgba(255, 31, 45, 0.34), transparent 27%),
-    linear-gradient(180deg, #07080d 0%, #020309 60%, #000000 100%);
+  background-color: #05060b;
+  background-image: 
+    radial-gradient(circle at 50% -20%, rgba(255, 31, 45, 0.05), transparent 80%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
   overflow-x: hidden;
+  background-attachment: fixed;
 }
 
-/* Arka plana basit yıldız görüntüsü veriyoruz. */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image:
-    radial-gradient(circle, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
-    radial-gradient(circle, rgba(255, 255, 255, 0.25) 1px, transparent 1px);
-  background-size: 120px 120px, 200px 200px;
-  opacity: 0.35;
-}
+
 
 .sayfa {
   width: min(940px, calc(100% - 36px));
@@ -53,12 +45,10 @@ body::after {
   line-height: 1;
   font-weight: 900;
   letter-spacing: 0;
-  text-shadow: 0 0 22px rgba(255, 255, 255, 0.28);
 }
 
 .baslikAlani h1 span {
   color: var(--kirmizi);
-  text-shadow: 0 0 24px rgba(255, 31, 45, 0.65);
 }
 
 .baslikAlani p {
@@ -85,17 +75,7 @@ body::after {
   overflow: hidden;
 }
 
-/* Kartın üstündeki parlak çizgi efekti. */
-.camKart::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 55%;
-  width: 280px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #ffffff, transparent);
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.85);
-}
+
 
 .kartBaslik {
   display: flex;
@@ -109,10 +89,12 @@ body::after {
   height: 54px;
   display: grid;
   place-items: center;
-  border-radius: 9px;
+  border-radius: 12px;
   font-size: 25px;
   color: var(--kirmizi);
-  background: rgba(255, 31, 45, 0.12);
+  background: rgba(255, 31, 45, 0.08);
+  border: 1px solid rgba(255, 31, 45, 0.2);
+  box-shadow: 0 8px 20px rgba(255, 31, 45, 0.15);
 }
 
 .kartBaslik h2,
@@ -150,7 +132,6 @@ body::after {
   font-size: 14px;
   color: var(--beyaz);
   background: var(--kirmizi);
-  box-shadow: 0 0 16px rgba(255, 31, 45, 0.72);
 }
 
 .inputAlani input {
@@ -184,10 +165,7 @@ body::after {
   border: none;
   border-radius: 9px;
   color: var(--beyaz);
-  background: linear-gradient(180deg, #ff2634, #e91522);
-  box-shadow:
-    0 0 22px rgba(255, 31, 45, 0.72),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  background: var(--kirmizi);
   font-size: 17px;
   font-weight: 900;
   cursor: pointer;
@@ -207,6 +185,9 @@ body::after {
   background: rgba(255, 31, 45, 0.12);
   font-size: 14px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .sonucKart {
@@ -238,12 +219,18 @@ body::after {
 }
 
 .aiYazi {
-  padding: 10px 16px;
+  padding: 8px 16px;
   border-radius: 999px;
-  color: #ffaaa9;
-  background: rgba(255, 31, 45, 0.11);
-  font-size: 13px;
+  color: #ff8e8d;
+  background: rgba(255, 31, 45, 0.08);
+  border: 1px solid rgba(255, 31, 45, 0.25);
+  font-size: 12px;
   font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Kullanıcı link girince video kapağı bu alanda gösterilir. */
@@ -319,37 +306,86 @@ body::after {
 .markdownAlani {
   padding: 25px;
   line-height: 1.75;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .markdownAlani h1,
 .markdownAlani h2,
 .markdownAlani h3 {
-  margin: 18px 0 10px;
+  margin: 28px 0 16px;
   color: var(--beyaz);
+  font-weight: 800;
 }
 
+.markdownAlani h1 { font-size: 28px; border-bottom: 1px solid var(--kenar); padding-bottom: 10px; }
+.markdownAlani h2 { font-size: 22px; color: var(--kirmizi); }
+.markdownAlani h3 { font-size: 18px; color: rgba(255, 255, 255, 0.95); }
+
 .markdownAlani p {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+.markdownAlani strong {
+  color: var(--beyaz);
+  font-weight: 700;
 }
 
 .markdownAlani ul,
 .markdownAlani ol {
   padding-left: 24px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .markdownAlani li {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+/* Tablo Tasarımı */
+.markdownAlani table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.markdownAlani th,
+.markdownAlani td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--kenar);
+}
+
+.markdownAlani th {
+  background: rgba(255, 31, 45, 0.1);
+  color: var(--kirmizi);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.markdownAlani tr:last-child td {
+  border-bottom: none;
+}
+
+.markdownAlani tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.markdownAlani blockquote {
+  border-left: 4px solid var(--kirmizi);
+  padding: 10px 20px;
+  margin: 20px 0;
+  background: rgba(255, 31, 45, 0.05);
+  font-style: italic;
+  border-radius: 0 8px 8px 0;
 }
 
 .yukleme {
-  width: 21px;
-  height: 21px;
-  border: 3px solid rgba(255, 255, 255, 0.45);
-  border-top-color: var(--beyaz);
-  border-radius: 50%;
-  animation: don 0.8s linear infinite;
+  animation: don 1.2s linear infinite;
 }
 
 @keyframes don {

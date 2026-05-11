@@ -1,6 +1,16 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { 
+  ArrowUpRight, 
+  Link as LinkIcon, 
+  Sparkles, 
+  LayoutDashboard, 
+  FileText,
+  CircleAlert,
+  LoaderCircle,
+  Zap
+} from "lucide-react";
 
 const BACKEND_URL =
   import.meta.env.VITE_AI_METRICS_BASE_URL ||
@@ -92,11 +102,13 @@ function App() {
 
       <section className="camKart">
         <div className="kartBaslik">
-          <div className="ikonKutu">↗</div>
+          <div className="ikonKutu">
+            <Zap size={24} fill="currentColor" />
+          </div>
 
           <div>
-            <h2>YOUTUBE BAĞLANTINI YAPIŞTIR</h2>
-            <p>Herhangi bir YouTube videosunun bağlantısını gir</p>
+            <h2>VİDEO ANALİZİ İÇİN BAĞLANTIYI GİRİN</h2>
+            <p>Hızlıca özetlemek istediğiniz YouTube videosunun adresini buraya yapıştırın</p>
           </div>
         </div>
 
@@ -112,10 +124,17 @@ function App() {
             onKeyDown={(e) => e.key === "Enter" && ozetle()}
           />
 
-          <div className="kopyaIkon">□</div>
+          <div className="kopyaIkon">
+            <LinkIcon size={20} />
+          </div>
         </div>
 
-        {hata && <div className="hataMesaji">{hata}</div>}
+        {hata && (
+          <div className="hataMesaji">
+            <CircleAlert size={16} />
+            {hata}
+          </div>
+        )}
 
         <button
           className="ozetButon"
@@ -124,13 +143,13 @@ function App() {
         >
           {yukleniyor ? (
             <>
-              <span className="yukleme"></span>
+              <LoaderCircle className="yukleme" size={20} />
               ÖZETLENİYOR...
             </>
           ) : (
             <>
               ÖZETLE
-              <span>✦</span>
+              <Sparkles size={18} />
             </>
           )}
         </button>
@@ -139,11 +158,15 @@ function App() {
       <section className="sonucKart">
         <div className="sonucBaslik">
           <div className="sonucSol">
-            <div className="kucukIkon">▣</div>
+            <div className="kucukIkon">
+              <LayoutDashboard size={18} />
+            </div>
             <h2>ÖZET SONUCU</h2>
           </div>
 
-          <div className="aiYazi">✦ AI ile oluşturuldu</div>
+          <div className="aiYazi">
+            <Sparkles size={14} /> AI Analizi
+          </div>
         </div>
 
         {videoId && (
@@ -172,7 +195,9 @@ function App() {
             </div>
           ) : (
             <div className="bosAlan">
-              <div className="bosIkon">▣</div>
+              <div className="bosIkon">
+                <FileText size={48} />
+              </div>
               <h3>Henüz bir özet oluşturulmadı</h3>
               <p>
                 YouTube bağlantısını yapıştır ve yapay zeka ile videonun
